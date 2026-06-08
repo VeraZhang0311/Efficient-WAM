@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Logs and experiment trackers
+logs/
+runs/
+wandb/
+tensorboard/
+*.log
+
+# Checkpoints and model outputs
+checkpoints/
+outputs/
+exports/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Data and caches
+datasets/
+data_cache/
+cache/
+*.hdf5
+*.h5
+*.npy
+*.npz
+
+# Temporary files
+*.tmp
+*.temp

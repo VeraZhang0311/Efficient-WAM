@@ -1,0 +1,40 @@
+checkpoint_path: /path/to/checkpoints/stage3/exports/stage3_step_80000.pt
+wan_path: /path/to/Wan2.2-TI2V-5B
+device: cuda
+
+common:
+  num_video_frames: 8
+  video_height: 384
+  video_width: 320
+  camera_names: [left_wrist, right_wrist, head]
+
+model:
+  compact_wan:
+    checkpoint_path: /path/to/Wan2.2-TI2V-5B
+    config_path: /path/to/Wan2.2-TI2V-5B
+    vae_path: /path/to/Wan2.2-TI2V-5B/Wan2.2_VAE.pth
+    precision: bfloat16
+    dim: 2048
+    ffn_dim: 8192
+    num_heads: 16
+    num_layers: 12
+    head_dim: 128
+    future_video_size: [192, 160]
+  action_expert:
+    dim: 768
+    ffn_dim: 3072
+    num_layers: 12
+    chunk_size: 16
+    state_dim: 31
+    action_dim: 31
+
+inference:
+  num_inference_steps: 10
+  video_refresh_steps: [0, 1]
+  execute_steps_per_chunk: 5
+  action_step_seconds: 0.3
+  torch_compile:
+    enabled: false
+    action_cache: true
+    mode: reduce-overhead
+    fullgraph: false

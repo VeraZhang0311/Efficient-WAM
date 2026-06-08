@@ -1,0 +1,67 @@
+robotwin_root: /path/to/RoboTwin
+conda_env: /path/to/conda/envs/RoboTwin
+wan_path: /path/to/Wan2.2-TI2V-5B
+
+policy_name: EfficientWAM
+task_name: adjust_bottle
+task_config: demo_clean
+ckpt_setting: /path/to/checkpoints/stage3/exports/stage3_step_80000.pt
+seed: 42
+instruction_type: unseen
+episode_num: 2
+multi_episode_num: 20
+tasks_file: tasks_all.txt
+gpu_ids: [0]
+
+common:
+  num_video_frames: 8
+  video_height: 384
+  video_width: 320
+
+action_normalization:
+  enabled: true
+  type: mean_std
+  stats_path: /path/to/action_stats.json
+
+inference:
+  num_inference_steps: 10
+  video_refresh_steps: [0, 1]
+  video_stop_cosine_threshold: null
+  action_skip_cosine_threshold: null
+  teacache:
+    enabled: false
+    delta: 0.2
+    poly_coefficients: null
+    sync_distributed: false
+    force_last_step: false
+    action_enabled: true
+    action_delta: null
+    action_force_last_step: false
+  save_predicted_video: true
+  predicted_video_fps: 4
+  predicted_video_every_n_chunks: 1
+  predicted_video_max_chunks_per_episode: null
+  predicted_video_dirname: efficient_wam_predicted_video
+  predicted_video_include_condition_frame: false
+  torch_compile:
+    enabled: false
+    action_cache: true
+    mode: reduce-overhead
+    fullgraph: false
+
+model:
+  compact_wan:
+    precision: bfloat16
+    dim: 2048
+    ffn_dim: 8192
+    num_heads: 16
+    num_layers: 12
+    head_dim: 128
+    future_video_size: [192, 160]
+  action_expert:
+    dim: 768
+    ffn_dim: 3072
+    num_layers: 12
+    chunk_size: 16
+    state_dim: 14
+    action_dim: 14

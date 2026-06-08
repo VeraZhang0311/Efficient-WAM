@@ -1,0 +1,59 @@
+# Efficient-WAM RoboTwin train-dataset build config.
+#
+# This config packs the converted RoboTwin 2.0 dataset into the unified
+# Efficient-WAM training format used by Stage 1/2/3.
+
+name: efficient_wam_train_dataset
+
+output_root: /path/to/efficient_wam_train_dataset
+
+source:
+  type: robotwin
+  root: /path/to/converted_robotwin
+
+  task_mode: multi
+  task_name: null
+  data_mode: both
+
+  num_video_frames: 8
+  video_size: [384, 320]
+  global_downsample_rate: 3
+  video_action_freq_ratio: 2
+
+  action_normalization:
+    enabled: true
+    type: mean_std
+
+latent:
+  vae_path: /path/to/Wan2.2-TI2V-5B/Wan2.2_VAE.pth
+  precision: bfloat16
+  shard_size: 10000
+  future_video_size: [192, 160]
+  reuse_condition_latent_from_clean: true
+
+language:
+  items_per_shard: 64
+  dtype: keep
+
+dataset:
+  type: efficient_wam_train
+  max_open_shards: 8
+  validate_runtime: false
+  language_policy: random_per_access
+  sampling:
+    mode: per_episode_random
+    samples_per_episode: 10
+    seed: 2026
+
+build:
+  device: cuda
+  batch_size: 64
+  num_workers: 4
+  pin_memory: true
+  persistent_workers: true
+  prefetch_factor: 2
+  qpos_cache_size: 8
+  progress_interval_seconds: 2.0
+  log_level: INFO
+  dist_timeout_minutes: 240
+  verify_condition_latent: true

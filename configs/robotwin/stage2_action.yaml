@@ -1,0 +1,53 @@
+system: stage2_action
+training_stage: stage2
+name: stage2
+max_steps: 80000
+per_device_batch_size: 16
+gradient_accumulation_steps: 1
+learning_rate: 5.0e-5
+weight_decay: 1.0e-3
+min_lr_ratio: 0.00001
+num_workers: 4
+pin_memory: true
+persistent_workers: true
+prefetch_factor: 2
+checkpoint_dir: checkpoints
+log_interval: 10
+checkpoint_interval: 40000
+checkpoint_total_limit: 10
+report_to: tensorboard
+resume_from: ""
+
+performance:
+  reuse_condition_latent_from_clean: true
+  verify_condition_latent_reuse: false
+
+dataset:
+  root: /path/to/efficient_wam_train_dataset
+
+model:
+  compact_wan_checkpoint: /path/to/checkpoints/stage1/exports/stage1_step_80000.pt
+  compact_wan:
+    checkpoint_path: /path/to/Wan2.2-TI2V-5B
+    config_path: /path/to/Wan2.2-TI2V-5B
+    vae_path: /path/to/Wan2.2-TI2V-5B/Wan2.2_VAE.pth
+    precision: bfloat16
+    dim: 2048
+    ffn_dim: 8192
+    num_heads: 16
+    num_layers: 12
+    head_dim: 128
+    future_video_size: [192, 160]
+  action_expert:
+    dim: 768
+    ffn_dim: 3072
+    num_layers: 12
+    chunk_size: 16
+    state_dim: 14
+    action_dim: 14
+  wan_frozen: true
+
+loss:
+  type: mot_joint_flow_matching
+  action_weight: 1.0
+  video_weight: 0.01
