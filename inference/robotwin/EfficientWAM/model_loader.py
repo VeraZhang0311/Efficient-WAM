@@ -49,7 +49,6 @@ COMPACT_WAN_COMPAT_KEYS = (
     "num_heads",
     "num_layers",
     "head_dim",
-    "future_video_size",
 )
 
 
@@ -176,7 +175,10 @@ def apply_runtime_overrides(config: Dict[str, Any], overrides: Dict[str, Any]) -
             field_name="action_skip_cosine_threshold",
         )
     if save_predicted_video is not None:
-        merged_inference["save_predicted_video"] = bool(save_predicted_video)
+        merged_inference["save_predicted_video"] = _parse_bool(
+            save_predicted_video,
+            field_name="save_predicted_video",
+        )
     if predicted_video_fps is not None:
         merged_inference["predicted_video_fps"] = int(predicted_video_fps)
     if predicted_video_every_n_chunks is not None:
@@ -186,7 +188,10 @@ def apply_runtime_overrides(config: Dict[str, Any], overrides: Dict[str, Any]) -
             predicted_video_max_chunks_per_episode
         )
     if predicted_video_include_condition_frame is not None:
-        merged_inference["predicted_video_include_condition_frame"] = bool(predicted_video_include_condition_frame)
+        merged_inference["predicted_video_include_condition_frame"] = _parse_bool(
+            predicted_video_include_condition_frame,
+            field_name="predicted_video_include_condition_frame",
+        )
     teacache_enabled = _override_value(
         overrides,
         "teacache_enabled",
@@ -708,14 +713,18 @@ def build_runtime_from_config(config: Dict[str, Any], device: str = "cuda") -> E
                 "The aloha robot is currently performing the following task: ",
             )
         ),
-        save_predicted_video=bool(inference_cfg.get("save_predicted_video", False)),
+        save_predicted_video=_parse_bool(
+            inference_cfg.get("save_predicted_video", False),
+            field_name="inference.save_predicted_video",
+        ),
         predicted_video_fps=int(inference_cfg.get("predicted_video_fps", 4)),
         predicted_video_every_n_chunks=max(1, int(inference_cfg.get("predicted_video_every_n_chunks", 1))),
         predicted_video_max_chunks_per_episode=(
             int(max_chunks) if max_chunks is not None else None
         ),
         predicted_video_dirname=str(inference_cfg.get("predicted_video_dirname", "efficient_wam_predicted_video")),
-        predicted_video_include_condition_frame=bool(
-            inference_cfg.get("predicted_video_include_condition_frame", True)
+        predicted_video_include_condition_frame=_parse_bool(
+            inference_cfg.get("predicted_video_include_condition_frame", True),
+            field_name="inference.predicted_video_include_condition_frame",
         ),
     )
