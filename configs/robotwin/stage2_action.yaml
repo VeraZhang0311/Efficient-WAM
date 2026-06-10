@@ -26,7 +26,7 @@ dataset:
   root: /path/to/efficient_wam_train_dataset
 
 model:
-  compact_wan_checkpoint: /path/to/checkpoints/stage1/exports/stage1_step_80000.pt
+  compact_wan_checkpoint: /path/to/checkpoints/stage1.pt
   compact_wan:
     checkpoint_path: /path/to/Wan2.2-TI2V-5B
     config_path: /path/to/Wan2.2-TI2V-5B

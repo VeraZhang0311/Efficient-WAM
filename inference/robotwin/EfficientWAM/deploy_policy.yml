@@ -5,7 +5,7 @@ wan_path: /path/to/Wan2.2-TI2V-5B
 policy_name: EfficientWAM
 task_name: adjust_bottle
 task_config: demo_clean
-ckpt_setting: /path/to/checkpoints/stage3/exports/stage3_step_80000.pt
+ckpt_setting: /path/to/checkpoints/stage3.pt
 seed: 42
 instruction_type: unseen
 episode_num: 2

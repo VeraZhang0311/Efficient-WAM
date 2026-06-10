@@ -1,4 +1,4 @@
-checkpoint_path: /path/to/checkpoints/stage3/exports/stage3_step_80000.pt
+checkpoint_path: /path/to/checkpoints/stage3.pt
 wan_path: /path/to/Wan2.2-TI2V-5B
 device: cuda
 
