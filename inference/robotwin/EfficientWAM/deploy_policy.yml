@@ -25,6 +25,7 @@ action_normalization:
 
 inference:
   num_inference_steps: 10
+  # Video-side denoising steps.
   video_refresh_steps: [0, 1]
   video_stop_cosine_threshold: null
   action_skip_cosine_threshold: null
@@ -57,6 +58,7 @@ model:
     num_heads: 16
     num_layers: 12
     head_dim: 128
+    # Low-resolution future-latent size; comment out for full-resolution settings.
     future_video_size: [192, 160]
   action_expert:
     dim: 768

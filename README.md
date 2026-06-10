@@ -3,7 +3,7 @@
 Efficient-WAM is a lightweight World-Action Model for efficient robot control. It reduces the cost of future imagination while preserving action performance through a compact video expert, multiscale future latents, and asymmetric video-action denoising.
 
 [![Project Page](https://img.shields.io/badge/Project%20Page-Efficient--WAM-2ea44f?style=for-the-badge)](https://efficientwam.github.io/)
-[![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](#)
+[![arXiv](https://img.shields.io/badge/arXiv-2606.10040-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.10040)
 [![Checkpoints](https://img.shields.io/badge/Checkpoints-coming%20soon-4f7cff?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-Apache--2.0-yellow?style=for-the-badge)](LICENSE)
 
@@ -132,8 +132,12 @@ If you find this project useful, please cite:
 @article{li2026efficientwam,
   title   = {Efficient-WAM: A 1B-Parameter World-Action Model with Low-Cost Future Imagination},
   author  = {Li, Jiajun and Guo, Tiecheng and Ye, Yifan and Zhang, Rongyu and Chi, Xiaowei and Sun, Qianpu and Li, Ying and Lou, Yunfan and Huang, Yan and Lu, Zhihe and Guo, Meng and Zhang, Shanghang},
-  journal = {arXiv preprint},
-  year    = {2026}
+  journal = {arXiv preprint arXiv:2606.10040},
+  year    = {2026},
+  eprint  = {2606.10040},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url     = {https://arxiv.org/abs/2606.10040}
 }
 ```
 
