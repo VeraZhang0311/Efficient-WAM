@@ -4,8 +4,8 @@ Efficient-WAM is a lightweight World-Action Model for efficient robot control. I
 
 [![Project Page](https://img.shields.io/badge/Project%20Page-Efficient--WAM-2ea44f?style=for-the-badge)](https://efficientwam.github.io/)
 [![arXiv](https://img.shields.io/badge/arXiv-2606.10040-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.10040)
-[![Checkpoints](https://img.shields.io/badge/Checkpoints-coming%20soon-4f7cff?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-Apache--2.0-yellow?style=for-the-badge)](LICENSE)
+[![MODELS](https://img.shields.io/badge/MODELS-Hugging%20Face-f5c542?style=for-the-badge)](https://huggingface.co/jiajun0613/Efficient-WAM_RoboTwin)
+[![License](https://img.shields.io/badge/License-Apache--2.0-4f7cff?style=for-the-badge)](LICENSE)
 
 ## Overview
 
