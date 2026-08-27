@@ -211,7 +211,9 @@ class RoboTwinConverter:
             compressed_data: Compressed image bytes from HDF5
             
         Returns:
-            BGR image array (OpenCV default format) for direct video writing
+            OpenCV BGR image array. Legacy RoboTwin 2.0 HDF5 files were
+            created by passing RGB arrays directly to cv2.imencode, so the
+            decoded channel values still correspond to the source RGB values.
         """
         try:
             # Convert bytes to numpy array
@@ -365,7 +367,9 @@ class RoboTwinConverter:
                         if combined_frame.shape[:2] != (target_height, target_width):
                             combined_frame = cv2.resize(combined_frame, (target_width, target_height))
                         
-                        # Convert BGR to RGB for proper video output
+                        # Compensate for the legacy RoboTwin 2.0 HDF5 encoding,
+                        # which passed RGB arrays directly to OpenCV's BGR encoder.
+                        # This swap lets the BGR-based VideoWriter restore RGB colors.
                         combined_frame_rgb = cv2.cvtColor(combined_frame, cv2.COLOR_BGR2RGB)
                         
                         # Ensure correct data type and memory layout
@@ -375,6 +379,7 @@ class RoboTwinConverter:
                         if not combined_frame_rgb.flags['C_CONTIGUOUS']:
                             combined_frame_rgb = np.ascontiguousarray(combined_frame_rgb)
                         
+                        # VideoWriter interprets three-channel frames as BGR.
                         video_writer.write(combined_frame_rgb)
                     else:
                         logger.warning(f"Failed to create combined frame at index {i}")

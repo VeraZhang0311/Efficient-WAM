@@ -69,7 +69,8 @@ def load_video_frames(video_path: str, frame_indices: List[int], target_size: Tu
 
     - Decoder: decord.VideoReader
     - Access: get_batch(frame_indices) to fetch arbitrary frames in one call
-    - Color: decord returns frames in RGB with HWC layout
+    - Color: decord returns frames in RGB with HWC layout. The converter has
+      already restored the legacy RoboTwin color order before this point.
 
     Args:
         video_path: Path to the video file.

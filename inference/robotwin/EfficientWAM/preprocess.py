@@ -38,7 +38,7 @@ def preprocess_robotwin_observation(
     observation: Dict[str, Any],
     target_size: Tuple[int, int] = (384, 320),
 ) -> Dict[str, Any]:
-    """Convert RoboTwin observation into EfficientWAM-ready tensors."""
+    """Convert RGB RoboTwin camera observations into EfficientWAM-ready tensors."""
     image = _extract_image(observation)
     if image.shape[:2] != target_size:
         image = resize_with_padding(image, target_size)
