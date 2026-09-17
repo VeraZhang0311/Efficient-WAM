@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 import torch
 import torch.nn as nn
 
-from .wan_model import WanVideoModel
+from .wan_model import WanVideoModel, _load_wan_arch_config
 
 
 @dataclass
@@ -65,6 +65,23 @@ class CompactWANModel(nn.Module):
             student_model_config=config.to_wan_model_config(),
             teacher_layer_mapping=config.teacher_layer_mapping,
             config_path=config.config_path or config.checkpoint_path,
+            device=device,
+            precision=config.precision,
+        )
+        return cls(config=config, video_model=video_model)
+
+    @classmethod
+    def from_exported_checkpoint(
+        cls,
+        config: CompactWANConfig,
+        device: str = "cuda",
+    ) -> "CompactWANModel":
+        """Construct the compact architecture before loading its exported weights."""
+        model_config = _load_wan_arch_config(config.config_path or config.checkpoint_path)
+        model_config.update(config.to_wan_model_config())
+        video_model = WanVideoModel(
+            model_config=model_config,
+            vae_path=config.vae_path,
             device=device,
             precision=config.precision,
         )

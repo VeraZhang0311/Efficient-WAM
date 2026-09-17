@@ -5,6 +5,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 POLICY_DIR="$SCRIPT_DIR"
+LOG_ROOT="${EFFICIENT_WAM_LOG_ROOT:-$POLICY_DIR}"
 CONFIG_FILE="${EFFICIENT_WAM_CONFIG:-${POLICY_DIR}/deploy_policy.yml}"
 
 MODE=""
@@ -364,7 +365,7 @@ run_single() {
     GPU_ID="${GPU_ID:-${GPU_IDS[0]:-0}}"
     export CUDA_VISIBLE_DEVICES="$GPU_ID"
 
-    log_dir="${POLICY_DIR}/logs_single_$(date +%Y%m%d_%H%M%S)"
+    log_dir="${LOG_ROOT}/logs_single_$(date +%Y%m%d_%H%M%S)"
     log_file="${log_dir}/${TASK_NAME}.log"
     mkdir -p "$log_dir"
 
@@ -630,7 +631,7 @@ run_multi() {
         gpu_pid[$gpu_id]=""
     done
 
-    log_dir="${POLICY_DIR}/logs_$(date +%Y%m%d_%H%M%S)"
+    log_dir="${LOG_ROOT}/logs_$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$log_dir"
 
     print_section "EfficientWAM Task List Evaluation"

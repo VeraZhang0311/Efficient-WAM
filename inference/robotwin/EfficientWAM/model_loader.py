@@ -523,7 +523,7 @@ def build_model_from_config(config: Dict[str, Any], device: str = "cuda") -> Sma
         head_dim=int(wan_cfg.get("head_dim", 128)),
         future_video_size=tuple(int(value) for value in future_video_size) if future_video_size else None,
     )
-    compact_wan = CompactWANModel.from_teacher_checkpoint(compact_cfg, device=device)
+    compact_wan = CompactWANModel.from_exported_checkpoint(compact_cfg, device=device)
     efficient_wam_cfg = SmallWAMActionConfig(
         compact_wan=compact_wan.config,
         action_dim=int(model_cfg["action_expert"]["action_dim"]),

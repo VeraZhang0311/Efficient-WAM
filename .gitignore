@@ -1,5 +1,7 @@
 # Python
 __pycache__/
+.venv/
+.external/
 *.py[cod]
 *.so
 *.egg-info/
@@ -40,3 +42,6 @@ cache/
 # Temporary files
 *.tmp
 *.temp
+
+# Local evaluation config
+inference/robotwin/EfficientWAM/deploy_policy.local.yml
