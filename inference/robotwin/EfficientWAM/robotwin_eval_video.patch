@@ -1,0 +1,90 @@
+diff --git a/envs/_base_task.py b/envs/_base_task.py
+index 982e6ec..a39bd92 100644
+--- a/envs/_base_task.py
++++ b/envs/_base_task.py
+@@ -98,6 +98,11 @@ class Base_Task(gym.Env):
+         self.now_obs = {}
+         self.take_action_cnt = 0
+         self.eval_video_path = kwags.get("eval_video_save_dir", None)
++        self.eval_video_mode = kwags.get("eval_video_mode", "default")
++        self.eval_video_fps = int(kwags.get("eval_video_fps", 25))
++        self.eval_video_timestep = float(kwags.get("timestep", 1 / 250))
++        self.eval_video_time = 0.0
++        self.eval_video_next_frame_time = 1.0 / self.eval_video_fps
+ 
+         self.save_freq = kwags.get("save_freq")
+         self.world_pcd = None
+@@ -1480,8 +1485,8 @@ class Base_Task(gym.Env):
+         if self.take_action_cnt == self.step_lim or self.eval_success:
+             return
+ 
+-        eval_video_freq = 1  # fixed
+-        if (self.eval_video_path is not None and self.take_action_cnt % eval_video_freq == 0):
++        if (self.eval_video_path is not None
++                and (self.eval_video_mode == "default" or self.take_action_cnt == 0)):
+             self.eval_video_ffmpeg.stdin.write(self.now_obs["observation"]["head_camera"]["rgb"].tobytes())
+ 
+         self.take_action_cnt += 1
+@@ -1653,12 +1658,24 @@ class Base_Task(gym.Env):
+ 
+             self.scene.step()
+             self._update_render()
++
++            if self.eval_video_path is not None and self.eval_video_mode == "smooth":
++                self.eval_video_time += self.eval_video_timestep
++                if self.eval_video_time + 1e-9 >= self.eval_video_next_frame_time:
++                    head_index = self.cameras.static_camera_name.index("head_camera")
++                    head_camera = self.cameras.static_camera_list[head_index]
++                    head_camera.take_picture()
++                    frame = (head_camera.get_picture("Color")[:, :, :3] * 255).clip(0, 255).astype("uint8")
++                    self.eval_video_ffmpeg.stdin.write(frame.tobytes())
++                    self.eval_video_next_frame_time += 1.0 / self.eval_video_fps
+                 
+             if self.check_success():
+                 self.eval_success = True
+-                self.get_obs() # update obs
+-                if (self.eval_video_path is not None):
+-                    self.eval_video_ffmpeg.stdin.write(self.now_obs["observation"]["head_camera"]["rgb"].tobytes())
++                if self.eval_video_path is not None and self.eval_video_mode == "default":
++                    self.get_obs()
++                    self.eval_video_ffmpeg.stdin.write(
++                        self.now_obs["observation"]["head_camera"]["rgb"].tobytes()
++                    )
+                 return
+ 
+         self._update_render()
+diff --git a/script/eval_policy.py b/script/eval_policy.py
+index eded198..a189bcb 100644
+--- a/script/eval_policy.py
++++ b/script/eval_policy.py
+@@ -81,6 +81,12 @@ def main(usr_args):
+     args['task_name'] = task_name
+     args["task_config"] = task_config
+     args["ckpt_setting"] = ckpt_setting
++    args["eval_video_mode"] = usr_args.get("eval_video_mode", "default")
++    if args["eval_video_mode"] not in ("default", "smooth"):
++        raise ValueError("eval_video_mode must be 'default' or 'smooth'")
++    args["eval_video_fps"] = int(usr_args.get("eval_video_fps", 25))
++    if args["eval_video_fps"] <= 0:
++        raise ValueError("eval_video_fps must be positive")
+ 
+     embodiment_type = args.get("embodiment")
+     embodiment_config_path = os.path.join(CONFIGS_PATH, "_embodiment_config.yml")
+@@ -159,7 +165,7 @@ def main(usr_args):
+ 
+     st_seed = 100000 * (1 + seed)
+     suc_nums = []
+-    test_num = 100
++    test_num = int(usr_args.get("test_num", usr_args.get("episode_num", 100)))
+     topk = 1
+ 
+     model = get_model(usr_args)
+@@ -273,7 +279,7 @@ def eval_policy(task_name,
+                     "-video_size",
+                     video_size,
+                     "-framerate",
+-                    "10",
++                    str(10 if args["eval_video_mode"] == "default" else args["eval_video_fps"]),
+                     "-i",
+                     "-",
+                     "-pix_fmt",

@@ -9,6 +9,10 @@ ckpt_setting: /path/to/checkpoints/stage3.pt
 seed: 42
 instruction_type: unseen
 episode_num: 2
+# Actual rollout video (episodeN.mp4): default = original 10 FPS, one frame per action;
+# smooth = capture simulator frames during each action at eval_video_fps.
+eval_video_mode: default
+eval_video_fps: 25
 multi_episode_num: 20
 tasks_file: tasks_all.txt
 gpu_ids: [0]

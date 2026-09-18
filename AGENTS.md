@@ -14,6 +14,14 @@
 - The RT checkpoint requires `future_video_size: [192, 160]` and `video_refresh_steps: [0, 1]`. The full-resolution Efficient-WAM checkpoint requires its matching settings; do not interchange the two configurations.
 - For an exported checkpoint, inference constructs the compact WAN architecture and loads the checkpoint strictly. It does not need the full WAN teacher diffusion weights. Training still uses the teacher initialization path.
 
+## RoboTwin actual rollout video
+
+- The actual execution video is `episodeN.mp4` under `/workspace/results/robotwin`. It is separate from the model prediction video in `efficient_wam_predicted_video/`.
+- Set `eval_video_mode` in `inference/robotwin/EfficientWAM/deploy_policy.local.yml` to `default` for RoboTwin's original recording: 10 FPS with one frame per policy action. Use this setting to reduce video recording overhead in larger evaluations.
+- Set `eval_video_mode: smooth` to capture intermediate simulator frames during each action. `eval_video_fps` controls the output and capture rate in this mode; the current local setting is 25 FPS. `eval_video_fps` does not change `default` mode.
+- The compatible RoboTwin checkout needs the integration patch in `inference/robotwin/EfficientWAM/robotwin_eval_video.patch`. The current `.external/RoboTwin` checkout already has it. If that checkout is recreated at commit `13c3c47`, run `git -C .external/RoboTwin apply inference/robotwin/EfficientWAM/robotwin_eval_video.patch` from the repository root. The patch also restores the `--episode-num` override described below.
+- Both modes passed a one-episode `adjust_bottle` check on 2026-09-18: `smooth` produced 670 frames at 25 FPS, and `default` produced 42 frames at 10 FPS; each run reported success 1/1. See `notes/NOTES.md` for commands and result locations.
+
 ## Run and inspect the one-episode check
 
 The Pod's NVIDIA Vulkan ICD points to `libGLX_nvidia.so.0`, which failed in this headless container. Generate a temporary ICD that uses the installed EGL library before running RoboTwin:

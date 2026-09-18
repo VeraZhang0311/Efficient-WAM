@@ -108,6 +108,20 @@ cd inference/robotwin/EfficientWAM
 bash eval.sh --config deploy_policy.yml --all
 ```
 
+The actual rollout recording (`episodeN.mp4`) uses `eval_video_mode` in the
+deployment config. Use `default` for RoboTwin's original 10 FPS recording with
+one frame per policy action. Use `smooth` to capture intermediate simulator
+frames at `eval_video_fps` (25 by default). `eval_video_fps` does not change the
+`default` mode. The model's predicted video has a separate
+`inference.predicted_video_fps` setting.
+
+For RoboTwin `stable_2.0` at commit `13c3c47`, apply the included integration
+patch once after cloning RoboTwin:
+
+```bash
+git -C /path/to/RoboTwin apply /path/to/Efficient-WAM/inference/robotwin/EfficientWAM/robotwin_eval_video.patch
+```
+
 ## Real-Robot Inference Template
 
 The real-robot template is provided in:
