@@ -100,6 +100,7 @@ inference/robotwin/EfficientWAM/
 ```
 
 Copy or link this folder into the RoboTwin benchmark policy directory, then update `deploy_policy.yml` with the exported checkpoint path and WAN-2.2 path. The package supports multiscale future latents through `future_video_size` and asymmetric denoising through `video_refresh_steps`.
+When using a virtual environment, leave `conda_env` empty and set `python_executable` to that environment's absolute Python path. The evaluation script checks for `sapien` before starting tasks.
 
 Example:
 

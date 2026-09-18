@@ -9,6 +9,7 @@
 ## Current RoboTwin smoke test
 
 - GPU: one NVIDIA A40. Python environment: `/root/Efficient-WAM/.venv` (Python 3.10).
+- The local deployment config sets `python_executable: /root/Efficient-WAM/.venv/bin/python`. `eval.sh` checks that this interpreter can import `sapien` before launching any task. The 2026-09-18 21:09 full-task attempt used an interpreter without `sapien`; its 50 failures were setup errors, not model scores.
 - Compatible RoboTwin checkout: `/root/Efficient-WAM/.external/RoboTwin`, pinned to `stable_2.0` commit `13c3c47`. Its `policy/EfficientWAM` directory links to this repository's `inference/robotwin/EfficientWAM` package.
 - The local deployment file is `inference/robotwin/EfficientWAM/deploy_policy.local.yml`. It uses the **Efficient-WAM-RT** checkpoint and action statistics in `/workspace/checkpoints/Efficient-WAM-RT`, plus the WAN VAE, T5, tokenizer, and `config.json` in `/workspace/base_models/Wan2.2-TI2V-5B`.
 - The RT checkpoint requires `future_video_size: [192, 160]` and `video_refresh_steps: [0, 1]`. The full-resolution Efficient-WAM checkpoint requires its matching settings; do not interchange the two configurations.

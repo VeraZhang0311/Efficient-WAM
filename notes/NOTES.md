@@ -35,6 +35,7 @@ PY
 ```
 
 当前 Pod 已有虚拟环境、模型文件、RoboTwin 资产链接和本地配置。评测时使用 `inference/robotwin/EfficientWAM/deploy_policy.local.yml`，它指向 RT stage3 checkpoint；仓库中的 `deploy_policy.yml` 是需要填写路径的模板。
+本地配置中的 `python_executable: /root/Efficient-WAM/.venv/bin/python` 明确指定评测解释器。`eval.sh` 会在启动任务前检查它能否导入 `sapien`，因此即使当前终端的 `PATH` 不同，也不会误用系统 Python。
 
 ## 跑一个任务、一个回合
 
@@ -52,7 +53,7 @@ bash inference/robotwin/EfficientWAM/eval.sh \
 
 ## 跑完整任务列表
 
-下面的命令会读取 `tasks_all.txt` 中的 **49 个任务**，在 GPU 0 上逐个运行，每个任务 20 回合。运行前按需要修改回合数；这是大批量 GPU 评测，不会因为这里只给出命令而自动启动。
+下面的命令会读取 `tasks_all.txt` 中的 **50 个任务**，在 GPU 0 上逐个运行，每个任务 20 回合。运行前按需要修改回合数；这是大批量 GPU 评测，不会因为这里只给出命令而自动启动。
 
 ```bash
 cd /root/Efficient-WAM

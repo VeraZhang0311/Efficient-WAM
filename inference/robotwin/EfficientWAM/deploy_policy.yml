@@ -1,5 +1,7 @@
 robotwin_root: /path/to/RoboTwin
 conda_env: /path/to/conda/envs/RoboTwin
+# Optional explicit interpreter; recommended for virtual environments.
+python_executable:
 wan_path: /path/to/Wan2.2-TI2V-5B
 
 policy_name: EfficientWAM

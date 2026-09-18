@@ -266,6 +266,7 @@ load_config() {
     POLICY_NAME="$(yaml_scalar policy_name "$CONFIG_FILE")"
     ROBOTWIN_ROOT="$(yaml_scalar robotwin_root "$CONFIG_FILE")"
     CONDA_ENV="$(yaml_scalar conda_env "$CONFIG_FILE")"
+    PYTHON_BIN="$(yaml_scalar python_executable "$CONFIG_FILE")"
     CHECKPOINT_PATH="$(yaml_scalar ckpt_setting "$CONFIG_FILE")"
     if [ -z "$CHECKPOINT_PATH" ]; then
         CHECKPOINT_PATH="$(yaml_scalar checkpoint_path "$CONFIG_FILE")"
@@ -335,6 +336,16 @@ activate_runtime() {
         conda activate "$CONDA_ENV"
     fi
 
+    if [ -z "$PYTHON_BIN" ]; then
+        PYTHON_BIN="$(command -v python)"
+    fi
+    if [ ! -x "$PYTHON_BIN" ]; then
+        die "Python executable not found: $PYTHON_BIN"
+    fi
+    if ! "$PYTHON_BIN" -c 'import sapien' >/dev/null 2>&1; then
+        die "Python $PYTHON_BIN cannot import sapien; set python_executable to the RoboTwin .venv Python in $CONFIG_FILE"
+    fi
+
     export PYTHONPATH="${ROBOTWIN_ROOT}:${PYTHONPATH:-}"
     export OMP_NUM_THREADS="${OMP_NUM_THREADS:-8}"
 }
@@ -344,7 +355,7 @@ run_task() {
     local episode_num="$2"
     local log_dir="$3"
 
-    python script/eval_policy.py \
+    "$PYTHON_BIN" script/eval_policy.py \
         --config "$CONFIG_FILE" \
         --overrides \
         --config_path "$CONFIG_FILE" \
@@ -374,6 +385,7 @@ run_single() {
     print_kv "Task Name" "$TASK_NAME"
     print_kv "GPU" "$GPU_ID"
     print_kv "RoboTwin Root" "$ROBOTWIN_ROOT"
+    print_kv "Python" "$PYTHON_BIN"
     print_kv "Checkpoint" "$CHECKPOINT_PATH"
     print_kv "WAN Path" "$WAN_PATH"
     print_kv "Task Config" "$TASK_CONFIG"
@@ -460,11 +472,7 @@ extract_success_rate() {
         return 0
     fi
 
-    if grep -q "failed with exit code\|Error:\|Traceback" "$log_file" 2>/dev/null; then
-        echo "0.0"
-    else
-        echo "N/A"
-    fi
+    echo "N/A"
 }
 
 write_results_summary() {
@@ -472,7 +480,7 @@ write_results_summary() {
     local episode_num="$2"
     shift 2
     local -a result_tasks=("$@")
-    local summary results_file velocity_task_file velocity_global_file velocity_tmp success failed scored_count total_score average_score total
+    local summary results_file velocity_task_file velocity_global_file velocity_tmp success failed scored_count total_score average_score average_label total
     local task log_file score
 
     summary="${log_dir}/evaluation_summary.txt"
@@ -516,6 +524,10 @@ write_results_summary() {
         if [ ! -f "$log_file" ]; then
             echo "  $task: LOG NOT FOUND" >> "$summary"
             echo "$task,N/A,LOG_NOT_FOUND,$log_file" >> "$results_file"
+            ((failed+=1))
+        elif grep -q "failed with exit code\|Traceback" "$log_file" 2>/dev/null; then
+            echo "  $task: ERROR (see $log_file)" >> "$summary"
+            echo "$task,N/A,ERROR,$log_file" >> "$results_file"
             ((failed+=1))
         elif [ "$score" != "N/A" ]; then
             echo "  $task: ${score}%" >> "$summary"
@@ -576,8 +588,10 @@ write_results_summary() {
 
     if [ "$scored_count" -gt 0 ]; then
         average_score="$(awk "BEGIN {printf \"%.1f\", $total_score / $scored_count}")"
+        average_label="${average_score}%"
     else
         average_score="N/A"
+        average_label="N/A"
     fi
     echo "AVERAGE,$average_score,,$results_file" >> "$results_file"
 
@@ -588,7 +602,7 @@ write_results_summary() {
         echo "Successful: $success"
         echo "Failed: $failed"
         echo "Total: $total"
-        echo "Average Success Rate: ${average_score}%"
+        echo "Average Success Rate: $average_label"
         echo ""
         echo "Results CSV: $results_file"
         echo "Velocity Cosine By Task/Step CSV: $velocity_task_file"
@@ -602,7 +616,7 @@ write_results_summary() {
     else
         paint "$C_RED" "Failed: $failed"
     fi
-    paint "$C_MAGENTA" "Average Success Rate: ${average_score}%"
+    paint "$C_MAGENTA" "Average Success Rate: $average_label"
     print_kv "Results CSV" "$results_file"
     print_kv "Velocity CSV" "$velocity_task_file"
     print_kv "Global Velocity CSV" "$velocity_global_file"
@@ -640,6 +654,7 @@ run_multi() {
     print_kv "Tasks" "${#tasks[@]}"
     print_kv "GPUs" "${GPU_IDS[*]}"
     print_kv "RoboTwin Root" "$ROBOTWIN_ROOT"
+    print_kv "Python" "$PYTHON_BIN"
     print_kv "Checkpoint" "$CHECKPOINT_PATH"
     print_kv "WAN Path" "$WAN_PATH"
     print_kv "Task Config" "$TASK_CONFIG"
